@@ -1,9 +1,19 @@
 import React from 'react';
+import Task from './components/Task';
+import TaskInput from './components/TaskInput';
 import './App.css';
 
+
 export default function App() {
-    const [newTask, setNewTask] = React.useState([]);
+    const [newTask, setNewTask] = React.useState(
+        JSON.parse(localStorage.getItem("newTask")) || []
+    );
     const [taskText, setTaskText] = React.useState('');
+
+    React.useEffect(() => {
+        localStorage.setItem("newTask", JSON.stringify(newTask))
+    }, [newTask])
+
 
     function handleAddTask(e) {
         e.preventDefault();
@@ -38,51 +48,22 @@ export default function App() {
     }
 
     return (
-        <>
-            <div className="input-container">
-                <h3>Create a Task</h3>
-                <label htmlFor="item"></label>
-                <input
+        <main className="app">
+            <section className="input-container">
+                <TaskInput
                     value={taskText}
-                    onChange={(e) => setTaskText(e.target.value)}
-                    type="text"
-                    name="item"
-                    id="item"
-                    className="task-input"
+                    setText={setTaskText}
+                    handleAddTask={handleAddTask}
+                    handleResetTaskList={resetTaskList}
                 />
-                <br />
-                <button onClick={handleAddTask}>Add Task</button>
-                <button onClick={resetTaskList}>Reset List</button>
-            </div>
-
-            {newTask.map((item) => {
-                return (
-                    <div key={item.id} className="task-card">
-                        <label htmlFor="checkbox"></label>
-                        <input
-                            type="checkbox"
-                            name="checkbox"
-                            id="checkbox"
-                            checked={item.checked}
-                            onChange={() => toggleTask(item.id)}
-                        />
-
-                        <span
-                            className={
-                                item.checked
-                                    ? 'input-box-true'
-                                    : 'input-box-false'
-                            }
-                        >
-                            {item.title}
-                        </span>
-
-                        <button onClick={(e) => deleteTask(e, item.id)}>
-                            Delete
-                        </button>
-                    </div>
-                );
-            })}
-        </>
+            </section>
+            <section className="task-container">
+                <Task
+                    tasks={newTask}
+                    handleToggleTask={toggleTask}
+                    handleDeleteTask={deleteTask}
+                />
+            </section>
+        </main>
     );
 }
