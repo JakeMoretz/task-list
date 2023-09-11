@@ -5,7 +5,7 @@ export default function TaskInput(props) {
     return (
         <>
              <div className="input-container">
-                <h3>Create a Task</h3>
+                <h3 className="task-title">Create a Task</h3>
                 <label htmlFor="item"></label>
                 <input
                     value={props.value}
@@ -16,8 +16,11 @@ export default function TaskInput(props) {
                     className="task-input"
                 />
                 <br />
-                <button onClick={props.handleAddTask}>Add Task</button>
-                <button onClick={props.handleResetTaskList}>Reset List</button>
+                <div className="btn-wrapper">
+                    <button className="btn add-task-btn" onClick={props.handleAddTask}>Add Task</button>
+                    <button className="btn reset-btn"onClick={props.handleResetTaskList}>Reset List</button>
+                </div>
+                
             </div>
         </>
     )

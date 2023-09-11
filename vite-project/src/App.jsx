@@ -1,6 +1,8 @@
 import React from 'react';
 import Task from './components/Task';
 import TaskInput from './components/TaskInput';
+
+
 import './App.css';
 
 
@@ -48,16 +50,19 @@ export default function App() {
     }
 
     return (
-        <main className="app">
-            <section className="input-container">
+       
+    
+        <main className= "app">
+            <section className="input-section">             
                 <TaskInput
                     value={taskText}
                     setText={setTaskText}
                     handleAddTask={handleAddTask}
                     handleResetTaskList={resetTaskList}
                 />
+                
             </section>
-            <section className="task-container">
+            <section className="task-section">
                 <Task
                     tasks={newTask}
                     handleToggleTask={toggleTask}
@@ -65,5 +70,7 @@ export default function App() {
                 />
             </section>
         </main>
+        
+       
     );
 }
