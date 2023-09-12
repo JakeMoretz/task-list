@@ -27,7 +27,7 @@ export default function Task(props) {
 
                         <img
                             className="task-btn-trash"
-                            onClick={(e) => props.handleDeleteTask(e, item.id)}
+                            onClick={() => props.handleDeleteTask(item.id)}
                             src="./trash.png"
                             alt=""
                         />

@@ -1,28 +1,35 @@
 import React from 'react';
 import Task from './components/Task';
 import TaskInput from './components/TaskInput';
-
+import { onSnapshot, addDoc, doc, deleteDoc } from 'firebase/firestore';
+import { taskCollection, database } from '../firebase';
 import './App.css';
 
 export default function App() {
-    const [newTask, setNewTask] = React.useState(
-        JSON.parse(localStorage.getItem('newTask')) || []
-    );
+    const [newTask, setNewTask] = React.useState([]);
+
     const [taskText, setTaskText] = React.useState('');
 
     React.useEffect(() => {
-        localStorage.setItem('newTask', JSON.stringify(newTask));
-    }, [newTask]);
+        const unsubscribe = onSnapshot(taskCollection, (snapshot) => {
+            const taskArr = snapshot.docs.map((doc) => ({
+                ...doc.data(),
+                id: doc.id,
+            }));
+            setNewTask(taskArr);
+        });
+        return unsubscribe;
+    }, []);
 
-    function handleAddTask(e) {
+    async function handleAddTask(e) {
         e.preventDefault();
         if (taskText.trim() !== '') {
             const newTaskItem = {
-                id: self.crypto.randomUUID(),
                 title: taskText,
                 checked: false,
             };
-            setNewTask((currentState) => [...currentState, newTaskItem]);
+
+            await addDoc(taskCollection, newTaskItem);
             setTaskText('');
         }
     }
@@ -35,11 +42,9 @@ export default function App() {
         );
     }
 
-    function deleteTask(event, itemId) {
-        event.stopPropagation();
-        setNewTask((currentTask) =>
-            currentTask.filter((item) => item.id !== itemId)
-        );
+    async function deleteTask(itemId) {
+        const docRef = doc(database, 'newTask', itemId);
+        await deleteDoc(docRef);
     }
 
     function resetTaskList() {
