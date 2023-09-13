@@ -1,7 +1,16 @@
 import React from 'react';
 import Task from './components/Task';
 import TaskInput from './components/TaskInput';
-import { onSnapshot, addDoc, doc, deleteDoc } from 'firebase/firestore';
+import {
+    onSnapshot,
+    addDoc,
+    doc,
+    deleteDoc,
+    getDocs,
+    collection,
+    getDoc,
+    updateDoc,
+} from 'firebase/firestore';
 import { taskCollection, database } from '../firebase';
 import './App.css';
 
@@ -34,12 +43,21 @@ export default function App() {
         }
     }
 
-    function toggleTask(itemId) {
-        setNewTask((currentTask) =>
-            currentTask.map((task) =>
-                task.id === itemId ? { ...task, checked: !task.checked } : task
-            )
-        );
+    async function toggleTask(itemId) {
+        try {
+            const docRef = doc(database, 'newTask', itemId);
+            const taskDoc = await getDoc(docRef);
+
+            if (taskDoc.exists()) {
+                const updatedTask = {
+                    ...taskDoc.data(),
+                    checked: !taskDoc.data().checked,
+                };
+                await updateDoc(docRef, updatedTask);
+            }
+        } catch (error) {
+            console.error('Error toggling task:', error);
+        }
     }
 
     async function deleteTask(itemId) {
@@ -47,8 +65,22 @@ export default function App() {
         await deleteDoc(docRef);
     }
 
-    function resetTaskList() {
-        setNewTask([]);
+    async function resetTaskList() {
+        try {
+            const querySnapshot = await getDocs(
+                collection(database, 'newTask')
+            );
+
+            const deletePromises = querySnapshot.docs.map(async (doc) => {
+                await deleteDoc(doc.ref);
+            });
+
+            await Promise.all(deletePromises);
+
+            setNewTask([]);
+        } catch (error) {
+            console.error('Error deleting tasks:', error);
+        }
     }
 
     return (
